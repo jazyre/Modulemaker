@@ -1,0 +1,11 @@
+{
+    "name": "ZarinpalGateway",
+    "alias": "zarinpalgateway",
+    "description": "Zarinpal payment gateway module.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ZarinpalGateway\\Providers\\ZarinpalGatewayServiceProvider"
+    ],
+    "files": []
+}
