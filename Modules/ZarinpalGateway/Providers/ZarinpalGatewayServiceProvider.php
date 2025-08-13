@@ -3,6 +3,9 @@
 namespace Modules\ZarinpalGateway\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Modules\ZarinpalGateway\Entities\ZarinpalGateway;
 use App\Interfaces\PaymentInterface;
 
@@ -26,6 +29,7 @@ class ZarinpalGatewayServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerConfig();
+        $this->registerDynamicEvents();
     }
 
     /**
@@ -52,6 +56,30 @@ class ZarinpalGatewayServiceProvider extends ServiceProvider
             __DIR__.'/../Config/config.php', $this->moduleNameLower
         );
     }
+
+    /**
+     * Register events and listeners dynamically from the database.
+     *
+     * @return void
+     */
+    protected function registerDynamicEvents()
+    {
+        // Ensure the table exists to prevent errors during initial migration.
+        if (Schema::hasTable('module_listeners')) {
+            $listeners = DB::table('module_listeners')->get();
+
+            foreach ($listeners as $listener) {
+                // Check if the listener class and event class exist before registering.
+                if (class_exists($listener->event) && class_exists($listener->listener)) {
+                    Event::listen(
+                        $listener->event,
+                        $listener->listener
+                    );
+                }
+            }
+        }
+    }
+
 
     /**
      * Get the services provided by the provider.
